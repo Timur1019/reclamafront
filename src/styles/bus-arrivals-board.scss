@@ -1,0 +1,134 @@
+.bus-arrivals-board {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.12);
+  overflow: hidden;
+}
+
+.bus-arrivals-board__head {
+  padding: 0.9rem 1rem 0.8rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.06));
+}
+
+.bus-arrivals-board__title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(2, 6, 23, 0.62);
+}
+
+.bus-arrivals-board__stop {
+  margin-top: 0.2rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: rgba(2, 6, 23, 0.92);
+}
+
+.bus-arrivals-board__sub {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: rgba(2, 6, 23, 0.6);
+}
+
+.bus-arrivals-board__route-label {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(2, 6, 23, 0.78);
+}
+
+.bus-arrivals-board__list {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.bus-arrivals-board__row {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.bus-arrivals-board__row:last-child {
+  border-bottom: none;
+}
+
+.bus-arrivals-board__eta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.bus-arrivals-board__eta-badge {
+  min-width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.18);
+}
+
+.bus-arrivals-board__eta-badge--ok {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+}
+
+.bus-arrivals-board__eta-badge--soon {
+  background: linear-gradient(135deg, #059669, #22c55e);
+}
+
+.bus-arrivals-board__eta-badge--urgent {
+  background: linear-gradient(135deg, #dc2626, #f97316);
+}
+
+.bus-arrivals-board__eta-unit {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(2, 6, 23, 0.72);
+}
+
+.bus-arrivals-board__route {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: rgba(2, 6, 23, 0.9);
+}
+
+.bus-arrivals-board__meta {
+  margin-top: 0.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: rgba(2, 6, 23, 0.65);
+}
+
+.bus-arrivals-board__plate {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(2, 6, 23, 0.78);
+}
+
+.bus-arrivals-board__dot {
+  opacity: 0.45;
+}
+
+.bus-arrivals-board__empty {
+  padding: 1rem;
+  text-align: center;
+  color: rgba(2, 6, 23, 0.6);
+  font-weight: 700;
+}
+

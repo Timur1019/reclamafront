@@ -50,3 +50,6 @@ function sameOriginWsBrokerUrl(): string {
 /** STOMP: VITE_WS_URL, иначе из VITE_API_BASE, иначе тот же хост что у страницы (прокси / rewrite на /ws). */
 export const wsBrokerUrl =
   import.meta.env.VITE_WS_URL ?? inferWsFromApiBase() ?? sameOriginWsBrokerUrl()
+
+/** Демо-режим (без backend): генерация маршрута и движения автобусов на фронте. */
+export const demoMode = String(import.meta.env.VITE_DEMO_MODE ?? '').trim() === '1'

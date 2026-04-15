@@ -28,7 +28,40 @@
   background: linear-gradient(145deg, $screen-accent, #1f4fbf);
   color: #fff;
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 900;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   border: 2px solid rgba(255, 255, 255, 0.35);
+  flex-direction: column;
+  line-height: 1;
+}
+
+.bus-map__marker-route {
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.bus-map__marker-plate {
+  margin-top: 0.05rem;
+  font-size: 0.55rem;
+  opacity: 0.92;
+}
+
+.bus-map__marker-inner[data-route='9'] {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+}
+
+.bus-map__marker-inner[data-route='34'] {
+  background: linear-gradient(135deg, #059669, #22c55e);
+}
+
+.bus-map__marker-inner[data-route='55'] {
+  background: linear-gradient(135deg, #ea580c, #f59e0b);
+}
+
+.bus-map__marker-inner[data-route='44'] {
+  background: linear-gradient(135deg, #6d28d9, #3b82f6);
+}
+
+.bus-map__marker-inner[data-route='77'] {
+  background: linear-gradient(135deg, #dc2626, #f97316);
 }

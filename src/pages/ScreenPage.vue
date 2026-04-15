@@ -5,23 +5,61 @@ import BusMap from '@/components/map/BusMap.vue'
 import YandexMapView from '@/components/map/YandexMapView.vue'
 import AdSlide from '@/components/ads/AdSlide.vue'
 import BusFleetPanel from '@/components/fleet/BusFleetPanel.vue'
+import BusRoutePanel from '@/components/fleet/BusRoutePanel.vue'
 import { usePositionsStore } from '@/stores/positions'
 import { useStompPositions } from '@/composables/useStompPositions'
+import { useDemoPositions } from '@/composables/useDemoPositions'
+import { useRouteVoiceAnnouncements } from '@/composables/useRouteVoiceAnnouncements'
 import { usePlaylistEngine } from '@/composables/usePlaylistEngine'
 import { buildScreenSegments } from '@/composables/buildScreenSegments'
 import { fetchScreenPlaylist } from '@/services/api/playlistApi'
 import { fetchActiveStops } from '@/services/api/stopsApi'
 import { parseCoord } from '@/utils/coords'
+import { demoMode } from '@/config/env'
+import { demoRoutePolyline } from '@/mock/demoPositions'
 import type { PlaylistSegment } from '@/types/playlist'
 
 const MAP_PROVIDER = (import.meta.env.VITE_MAP_PROVIDER ?? 'yandex').toLowerCase()
-const mapIsLeaflet = MAP_PROVIDER === 'leaflet'
-const MAP_BLOCK_MS = Math.max(5000, Number(import.meta.env.VITE_MAP_BLOCK_SECONDS ?? 22) * 1000)
+// Увеличено для киоска: по умолчанию 60 секунд карты.
+const MAP_BLOCK_MS = Math.max(5000, Number(import.meta.env.VITE_MAP_BLOCK_SECONDS ?? 60) * 1000)
 
 const route = useRoute()
+const demoQueryOn = computed(() => route.query.demo === '1')
+const demoEnabled = computed(() => demoMode || demoQueryOn.value)
+const mapIsLeaflet = computed(() => demoEnabled.value || MAP_PROVIDER === 'leaflet')
 const stopCode = computed(() => {
   const q = route.query.stop
   return typeof q === 'string' && q.length > 0 ? q : null
+})
+
+const demoStop = computed(() => {
+  // “Фарҳод бозори” — дефолтная точка для демо-табло
+  return { code: 'FARHAD', title: 'Фарҳод бозори', lat: 39.655, lng: 66.982 }
+})
+
+const demoRouteLabel = computed(() => 'Маршрут: 56-A, 146-A, 141-A, 116-A, 77-A, 2-A')
+
+const mapExpanded = ref(false)
+
+const effectiveStopTarget = computed<{ lat: number; lng: number } | null>(() => {
+  if (stopTarget.value) return stopTarget.value
+  if (demoEnabled.value) return { lat: demoStop.value.lat, lng: demoStop.value.lng }
+  return null
+})
+
+const effectiveStopTitle = computed(() => {
+  if (stopCode.value) return stopCode.value
+  if (demoEnabled.value) return demoStop.value.title
+  return ''
+})
+
+// По умолчанию голос включён (особенно в демо/киоск режиме).
+// Можно отключить явно: ?voice=0
+const voiceEnabled = computed(() => {
+  const q = route.query.voice
+  if (q === '0') return false
+  if (q === '1') return true
+  return demoEnabled.value
 })
 
 const segmentsRef = ref<PlaylistSegment[]>([{ kind: 'map', durationMs: MAP_BLOCK_MS }])
@@ -29,6 +67,12 @@ const playlist = usePlaylistEngine(segmentsRef)
 const positions = usePositionsStore()
 /** Координаты остановки из справочника для оценки прибытия */
 const stopTarget = ref<{ lat: number; lng: number } | null>(null)
+
+const displayPositions = computed(() => {
+  if (!demoEnabled.value) return positions.list
+  // В демо показываем только “наши” автобусы, чтобы не светились данные бэка (DEMO-1 и т.п.)
+  return positions.list.filter((p) => String(p.busId).startsWith('demo-'))
+})
 
 const showMap = computed(() => playlist.current.value.kind === 'map')
 const showAd = computed(() => playlist.current.value.kind === 'ad')
@@ -89,7 +133,18 @@ watch(
   { immediate: true },
 )
 
-useStompPositions()
+if (!demoMode) {
+  // В prod/env демо-режим обычно выключен, но для демонстрации можно включить ?demo=1
+  useStompPositions()
+}
+useDemoPositions({ tickMs: 850, enabled: demoEnabled })
+
+const voiceAnnouncer = useRouteVoiceAnnouncements({
+  enabled: voiceEnabled,
+  positions: displayPositions,
+  stopTarget: effectiveStopTarget,
+  stopTitle: effectiveStopTitle,
+})
 
 onMounted(() => {
   void refreshPlaylist()
@@ -107,7 +162,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="screen-page">
+  <div class="screen-page" :class="{ 'screen-page--demo': demoEnabled }">
     <header class="screen-page__header">
       <div class="screen-page__brand">SmartStop · Самарканд</div>
       <div class="screen-page__actions">
@@ -123,14 +178,36 @@ onUnmounted(() => {
     <main class="screen-page__stage">
       <Transition name="screen-page__fade">
         <div v-show="showMap" class="screen-page__pane screen-page__pane--map">
-          <div class="screen-page__map-layout">
-            <YandexMapView v-if="!mapIsLeaflet" class="screen-page__map-main" />
-            <BusMap v-else class="screen-page__map-main" :positions="positions.list" />
-            <BusFleetPanel
-              :positions="positions.list"
-              :stop-target="stopTarget"
-              :stop-code="stopCode"
+          <div v-if="demoEnabled" class="screen-page__split" :class="{ 'screen-page__split--expanded': mapExpanded }">
+            <div class="screen-page__map-wrap">
+              <BusMap class="screen-page__map-main" :positions="displayPositions" :route-path="demoRoutePolyline()" />
+              <button class="screen-page__map-toggle" type="button" @click="mapExpanded = !mapExpanded">
+                {{ mapExpanded ? 'Показать маршрут' : 'Увеличить карту' }}
+              </button>
+              <button
+                v-if="voiceEnabled"
+                class="screen-page__voice-test"
+                type="button"
+                @click="voiceAnnouncer.testSpeak()"
+              >
+                Проверить голос
+              </button>
+              <div v-if="voiceEnabled && voiceAnnouncer.blockedHint" class="screen-page__voice-hint" role="note">
+                {{ voiceAnnouncer.blockedHint }}
+              </div>
+            </div>
+            <BusRoutePanel
+              v-if="!mapExpanded && effectiveStopTarget"
+              :positions="displayPositions"
+              :stop-target="effectiveStopTarget"
+              :stop-title="effectiveStopTitle"
+              :route-label="demoRouteLabel"
             />
+          </div>
+          <div v-else class="screen-page__map-layout">
+            <YandexMapView v-if="!mapIsLeaflet" class="screen-page__map-main" />
+            <BusMap v-else class="screen-page__map-main" :positions="displayPositions" />
+            <BusFleetPanel :positions="displayPositions" :stop-target="effectiveStopTarget" :stop-code="stopCode" />
           </div>
         </div>
       </Transition>
@@ -160,6 +237,7 @@ onUnmounted(() => {
           · Яндекс: только фоновая карта, маркеры ТС не рисуются. Маркеры — при
           <code>VITE_MAP_PROVIDER=leaflet</code>
         </span>
+        <span v-else-if="demoEnabled" class="screen-page__hint">· DEMO: включено</span>
       </div>
     </footer>
   </div>

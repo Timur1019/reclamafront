@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, ref, shallowRef } from 'vue'
+import { onMounted, onUnmounted, watch, ref, shallowRef, nextTick } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { BusPosition } from '@/types/position'
@@ -9,11 +9,14 @@ import { parseCoord } from '@/utils/coords'
 
 const props = defineProps<{
   positions: BusPosition[]
+  routePath?: { lat: number; lng: number }[] | null
 }>()
 
 const el = ref<HTMLElement | null>(null)
 const map = shallowRef<L.Map | null>(null)
 const layer = shallowRef<L.LayerGroup | null>(null)
+const routeLayer = shallowRef<L.Polyline | null>(null)
+let resizeObs: ResizeObserver | null = null
 
 const DEFAULT_ZOOM = 12
 
@@ -27,9 +30,14 @@ function buildMarkers(positions: BusPosition[]): L.Marker[] {
   return positions.map((p) => {
     const lat = parseCoord(p.latitude)
     const lng = parseCoord(p.longitude)
+    const route = p.routeCode ? String(p.routeCode) : ''
+    const plateTail = p.plateNumber.replace(/\s+/g, ' ').trim().slice(-3)
     const icon = L.divIcon({
       className: 'bus-map__marker',
-      html: `<span class="bus-map__marker-inner">${escapeHtml(p.plateNumber.slice(-4))}</span>`,
+      html: `<span class="bus-map__marker-inner" data-route="${escapeHtml(route)}">
+        <span class="bus-map__marker-route">${escapeHtml(route || '—')}</span>
+        <span class="bus-map__marker-plate">${escapeHtml(plateTail)}</span>
+      </span>`,
       iconSize: [36, 36],
       iconAnchor: [18, 18],
     })
@@ -92,7 +100,21 @@ onMounted(() => {
   m.setView(SAMARKAND_CENTER, DEFAULT_ZOOM)
   map.value = m
   layer.value = g
+  if (props.routePath && props.routePath.length >= 2) {
+    routeLayer.value = L.polyline(
+      props.routePath.map((p) => [p.lat, p.lng] as L.LatLngExpression),
+      { color: '#0d6efd', weight: 4, opacity: 0.85 },
+    ).addTo(m)
+  }
   redraw()
+
+  void nextTick(() => {
+    m.invalidateSize()
+  })
+  resizeObs = new ResizeObserver(() => {
+    map.value?.invalidateSize()
+  })
+  resizeObs.observe(el.value)
 })
 
 watch(
@@ -101,10 +123,29 @@ watch(
   { deep: true },
 )
 
+watch(
+  () => props.routePath,
+  (path) => {
+    if (!map.value) return
+    routeLayer.value?.remove()
+    routeLayer.value = null
+    if (path && path.length >= 2) {
+      routeLayer.value = L.polyline(
+        path.map((p) => [p.lat, p.lng] as L.LatLngExpression),
+        { color: '#0d6efd', weight: 4, opacity: 0.85 },
+      ).addTo(map.value)
+    }
+  },
+  { deep: true },
+)
+
 onUnmounted(() => {
+  resizeObs?.disconnect()
+  resizeObs = null
   map.value?.remove()
   map.value = null
   layer.value = null
+  routeLayer.value = null
 })
 </script>
 

@@ -1,6 +1,7 @@
 export type AdMedia =
   | { type: 'image'; src: string }
   | { type: 'video'; src: string; poster?: string }
+  | { type: 'youtube'; src: string }
 
 export type PlaylistSegment =
   | { kind: 'map'; durationMs: number }

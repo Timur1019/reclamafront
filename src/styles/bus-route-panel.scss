@@ -1,0 +1,127 @@
+.bus-route-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.12);
+  overflow: hidden;
+}
+
+.bus-route-panel__head {
+  padding: 0.9rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.06));
+}
+
+.bus-route-panel__title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: rgba(2, 6, 23, 0.92);
+}
+
+.bus-route-panel__route {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(2, 6, 23, 0.72);
+}
+
+.bus-route-panel__list {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.bus-route-panel__row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.bus-route-panel__row:last-child {
+  border-bottom: none;
+}
+
+.bus-route-panel__eta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.bus-route-panel__eta-badge {
+  min-width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.18);
+}
+
+.bus-route-panel__eta-badge--ok {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+}
+
+.bus-route-panel__eta-badge--soon {
+  background: linear-gradient(135deg, #059669, #22c55e);
+}
+
+.bus-route-panel__eta-badge--urgent {
+  background: linear-gradient(135deg, #dc2626, #f97316);
+}
+
+.bus-route-panel__eta-unit {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: rgba(2, 6, 23, 0.7);
+}
+
+.bus-route-panel__line1 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.bus-route-panel__route-code {
+  font-weight: 900;
+  color: rgba(2, 6, 23, 0.86);
+}
+
+.bus-route-panel__plate {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: rgba(2, 6, 23, 0.72);
+  white-space: nowrap;
+}
+
+.bus-route-panel__line2 {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(2, 6, 23, 0.6);
+}
+
+.bus-route-panel__dot {
+  opacity: 0.4;
+}
+
+.bus-route-panel__empty {
+  padding: 1rem;
+  text-align: center;
+  color: rgba(2, 6, 23, 0.6);
+  font-weight: 800;
+}
+

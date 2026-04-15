@@ -8,6 +8,11 @@ export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', name: 'screen', component: ScreenPage },
+    {
+      path: '/demo',
+      name: 'screen-demo',
+      redirect: { path: '/', query: { demo: '1' } },
+    },
     { path: '/admin/login', name: 'admin-login', component: AdminLoginPage },
     {
       path: '/admin/ads',
