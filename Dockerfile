@@ -10,7 +10,8 @@ RUN npm ci
 
 COPY . .
 
-# Обязательно для prod: полный URL API без слэша в конце (https://your-api.onrender.com)
+# Обязательно: REST — https://host без слэша в конце. WS — только wss://host/ws (не https://).
+# VITE_WS_URL можно не передавать: в бандле URL вебсокета выводится из VITE_API_BASE (см. src/config/env.ts).
 ARG VITE_API_BASE
 ARG VITE_WS_URL
 ARG VITE_MAP_PROVIDER=yandex
