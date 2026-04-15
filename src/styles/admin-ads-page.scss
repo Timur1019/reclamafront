@@ -1,0 +1,23 @@
+.admin-ads-page {
+  min-height: 100vh;
+  background: $screen-bg;
+  color: $screen-text;
+}
+
+.admin-ads-page__head h1 {
+  color: $screen-text;
+}
+
+.admin-ads-page__lead {
+  max-width: 720px;
+}
+
+.admin-ads-page__table-wrap {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.admin-ads-page__form-card {
+  border-radius: 12px;
+}

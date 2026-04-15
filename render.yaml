@@ -1,0 +1,17 @@
+# Blueprint: New → Blueprint в Render, подключи репозиторий.
+# VITE_API_BASE задай в UI при создании или в Environment (значение уйдёт в docker build).
+services:
+  - type: web
+    name: reclama-front
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    envVars:
+      - key: VITE_API_BASE
+        sync: false
+      - key: VITE_WS_URL
+        sync: false
+      - key: VITE_MAP_PROVIDER
+        value: yandex
+      - key: VITE_MAP_BLOCK_SECONDS
+        value: "22"

@@ -1,0 +1,149 @@
+.bus-fleet-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(18, 26, 43, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.bus-fleet-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.bus-fleet-panel__title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.bus-fleet-panel__lead {
+  margin: 0;
+  padding: 0.5rem 1rem 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(203, 213, 225, 0.88);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bus-fleet-panel__badge {
+  min-width: 1.5rem;
+  text-align: center;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(61, 139, 253, 0.25);
+  color: #cfe4ff;
+}
+
+.bus-fleet-panel__hint {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: $screen-muted;
+}
+
+.bus-fleet-panel__scroll {
+  overflow: auto;
+  flex: 1;
+  min-height: min(52px * 6 + 44px, 52vh);
+  max-height: min(72vh, 720px);
+}
+
+.bus-fleet-panel__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.bus-fleet-panel__table th,
+.bus-fleet-panel__table td {
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.bus-fleet-panel__table tbody tr {
+  min-height: 52px;
+}
+
+.bus-fleet-panel__table th {
+  color: $screen-muted;
+  font-weight: 600;
+  font-size: 0.8rem;
+  position: sticky;
+  top: 0;
+  background: rgba(14, 22, 40, 0.98);
+  z-index: 1;
+}
+
+.bus-fleet-panel__plate {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.bus-fleet-panel__route {
+  font-variant-numeric: tabular-nums;
+  color: #b8d9ff;
+  font-weight: 600;
+}
+
+.bus-fleet-panel__speed {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bus-fleet-panel__arrival {
+  min-width: 7.5rem;
+}
+
+.bus-fleet-panel__arrival-clock {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: #f8fafc;
+}
+
+.bus-fleet-panel__arrival-sub {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(203, 213, 225, 0.82);
+  line-height: 1.25;
+  max-width: 12rem;
+}
+
+.bus-fleet-panel__arrival--at .bus-fleet-panel__arrival-clock {
+  font-size: 1rem;
+  color: #6ee7b7;
+}
+
+.bus-fleet-panel__arrival--na .bus-fleet-panel__arrival-clock {
+  font-size: 1rem;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.bus-fleet-panel__signal {
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+
+.bus-fleet-panel__empty {
+  text-align: center;
+  color: $screen-muted;
+  padding: 1rem !important;
+}
