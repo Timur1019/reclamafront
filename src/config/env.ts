@@ -1,13 +1,14 @@
-const dev = import.meta.env.DEV
+/**
+ * Пустая строка — запросы на тот же origin (путь /api/...).
+ * - dev: Vite proxy (vite.config) шлёт /api и /ws на localhost:8080.
+ * - prod без VITE_API_BASE: задай на Render Static «Rewrite» /api/* → https://твой-бэкенд.onrender.com/api/*
+ *   или задай VITE_API_BASE при сборке (прямой вызов бэкенда, нужен CORS).
+ */
+export const apiBase = String(import.meta.env.VITE_API_BASE ?? '').trim()
 
-/** В dev — пустая строка (прокси Vite); в prod — полный URL API (обязательно на Render Static Site) */
-export const apiBase = import.meta.env.VITE_API_BASE ?? (dev ? '' : 'http://localhost:8080')
-
-if (!dev && !import.meta.env.VITE_API_BASE) {
+if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE) {
   console.warn(
-    '[SmartStop] Сборка без VITE_API_BASE — запросы идут на',
-    apiBase,
-    '. Render: сервис → Environment → ключ ровно VITE_API_BASE → URL бэкенда → Save, rebuild and deploy.',
+    '[SmartStop] VITE_API_BASE не задан при сборке: REST идёт на этот же домен (/api/...). Либо добавь VITE_API_BASE в Render Environment и пересобери, либо настрой Rewrite /api/* на бэкенд.',
   )
 }
 
@@ -25,9 +26,12 @@ function inferWsFromApiBase(): string | null {
   }
 }
 
-/** STOMP broker: dev — тот же хост что у страницы (прокси); prod — VITE_WS_URL или из VITE_API_BASE */
+function sameOriginWsBrokerUrl(): string {
+  const proto = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const host = typeof window !== 'undefined' ? window.location.host : 'localhost:5173'
+  return `${proto}//${host}/ws`
+}
+
+/** STOMP: VITE_WS_URL, иначе из VITE_API_BASE, иначе тот же хост что у страницы (прокси / rewrite на /ws). */
 export const wsBrokerUrl =
-  import.meta.env.VITE_WS_URL ??
-  (dev
-    ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
-    : inferWsFromApiBase() ?? 'ws://localhost:8080/ws')
+  import.meta.env.VITE_WS_URL ?? inferWsFromApiBase() ?? sameOriginWsBrokerUrl()
