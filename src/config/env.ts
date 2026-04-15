@@ -1,24 +1,39 @@
 /**
  * Пустая строка — запросы на тот же origin (путь /api/...).
  * - dev: Vite proxy (vite.config) шлёт /api и /ws на localhost:8080.
- * - prod без VITE_API_BASE: задай на Render Static «Rewrite» /api/* → https://твой-бэкенд.onrender.com/api/*
- *   или задай VITE_API_BASE при сборке (прямой вызов бэкенда, нужен CORS).
+ * - prod: задай VITE_API_BASE=https://публичный-бэкенд... или Rewrite /api/* на Render.
+ * Если в .env стоит VITE_API_BASE=http://localhost:8080, оно игнорируется — иначе axios
+ * обходит прокси и снова бьёт в localhost:8080 (частые 404).
  */
-export const apiBase = String(import.meta.env.VITE_API_BASE ?? '').trim()
+const rawViteApiBase = String(import.meta.env.VITE_API_BASE ?? '').trim()
 
-if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE) {
+function isLoopbackHttpUrl(value: string): boolean {
+  if (!value) return false
+  try {
+    const h = new URL(value).hostname.toLowerCase()
+    return h === 'localhost' || h === '127.0.0.1' || h === '[::1]'
+  } catch {
+    return false
+  }
+}
+
+export const apiBase =
+  !rawViteApiBase || isLoopbackHttpUrl(rawViteApiBase) ? '' : rawViteApiBase
+
+if (import.meta.env.PROD && !apiBase) {
   console.warn(
-    '[SmartStop] VITE_API_BASE не задан при сборке: REST идёт на этот же домен (/api/...). Либо добавь VITE_API_BASE в Render Environment и пересобери, либо настрой Rewrite /api/* на бэкенд.',
+    rawViteApiBase && isLoopbackHttpUrl(rawViteApiBase)
+      ? '[SmartStop] VITE_API_BASE указывал на localhost — в проде это отключено, REST идёт на тот же домен (/api/...). Удали localhost из Render Environment или задай публичный URL бэкенда.'
+      : '[SmartStop] VITE_API_BASE не задан: REST на тот же домен (/api/...). Добавь VITE_API_BASE (https://...) в Render или Rewrite /api/*.',
   )
 }
 
 function inferWsFromApiBase(): string | null {
-  const raw = import.meta.env.VITE_API_BASE
-  if (typeof raw !== 'string' || raw.length === 0) {
+  if (!rawViteApiBase || isLoopbackHttpUrl(rawViteApiBase)) {
     return null
   }
   try {
-    const u = new URL(raw)
+    const u = new URL(rawViteApiBase)
     const wsProto = u.protocol === 'https:' ? 'wss:' : 'ws:'
     return `${wsProto}//${u.host}/ws`
   } catch {
