@@ -3,6 +3,14 @@ const dev = import.meta.env.DEV
 /** В dev — пустая строка (прокси Vite); в prod — полный URL API (обязательно на Render Static Site) */
 export const apiBase = import.meta.env.VITE_API_BASE ?? (dev ? '' : 'http://localhost:8080')
 
+if (!dev && !import.meta.env.VITE_API_BASE) {
+  console.warn(
+    '[SmartStop] Сборка без VITE_API_BASE — запросы идут на',
+    apiBase,
+    '. Render: сервис → Environment → ключ ровно VITE_API_BASE → URL бэкенда → Save, rebuild and deploy.',
+  )
+}
+
 function inferWsFromApiBase(): string | null {
   const raw = import.meta.env.VITE_API_BASE
   if (typeof raw !== 'string' || raw.length === 0) {
